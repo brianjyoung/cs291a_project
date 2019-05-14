@@ -2,9 +2,8 @@ import cv2
 import dlib
 from imutils import face_utils
 import numpy as np
-import os
 
-CASCADE_PATH = './venv/Lib/site-packages/cv2/data/'
+FACE_CASCADE_FILE = 'haarcascade_frontalface_default.xml'
 MOUTH_CASCADE_FILE = 'haarcascade_smile.xml'
 
 
@@ -14,8 +13,8 @@ def largest_box(arr: np.ndarray) -> np.ndarray:
 
 
 class FeatureExtractor(object):
-    face_cascade = cv2.CascadeClassifier(os.path.join(CASCADE_PATH, 'haarcascade_frontalface_default.xml'))
-    mouth_cascade = cv2.CascadeClassifier(os.path.join(CASCADE_PATH, MOUTH_CASCADE_FILE))
+    face_cascade = cv2.CascadeClassifier(FACE_CASCADE_FILE)
+    mouth_cascade = cv2.CascadeClassifier(MOUTH_CASCADE_FILE)
     landmark_predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat')
 
     def __init__(self, video_file: str):
