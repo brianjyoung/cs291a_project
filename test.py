@@ -7,7 +7,7 @@ from sklearn.decomposition import PCA
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 import time
-
+import pickle
 start_time = time.time()
 
 # DIRECTORY OF TRAINING DATA
@@ -35,7 +35,7 @@ for i, file in enumerate(files):
     differences = filters[1:] - filters[:-1]
     data[i] = np.sum(differences, 1)
     #print("File {} complete.".format(i))
-
+pickle.dump(data,open('data.pk','wb'))
 # Perform PCA on (normalized) training data
 scaler = StandardScaler()
 scaler.fit(data)
