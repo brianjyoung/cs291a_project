@@ -9,8 +9,8 @@ from sklearn.preprocessing import StandardScaler
 
 # DIRECTORY OF TRAINING DATA
 files = os.listdir('training_dump')
-data = np.empty((len(files), 60))
-for i, file in enumerate(files):
+data = np.empty((10, 60))
+for i, file in enumerate(files[:10]):
     # Extract lip as 60x80 image
     file = os.path.join('training_dump', file)
     fe = FeatureExtractor.from_image(file)
@@ -20,12 +20,14 @@ for i, file in enumerate(files):
     print("File {} lips extracted.".format(i))
 
     # Convert lip image to 60-dimensional feature vector
-    filters = np.empty((61, 4800))
     if fe.lips is None:
+        print("File {} skipped, lips could not be found.".format(i))
         continue
-    filters[0] = fe.lips[0].flatten('F')
-    for j in range(1, 61):
-        filters[j] = MSA.multiscale_step(j+1, filters[j-1])
+    # filters = np.empty((61, 4800))
+    # filters[0] = fe.lips[0].flatten('F')
+    # for j in range(1, 61):
+    #     filters[j] = MSA.multiscale_step(j+1, filters[0])
+    filters = MSA.multiscale_full(fe.lips[0].flatten('F'))
     differences = filters[1:] - filters[:-1]
     data[i] = np.sum(differences, 1)
     print("File {} complete.".format(i))
