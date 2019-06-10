@@ -1,40 +1,26 @@
 from numba import jit, prange
 import numpy as np
 
-
-# returns the set of connected subsets containing r elements, containing x
-@jit(nopython=True)
-def connected_subsets(data: np.ndarray, r: int, x: int) -> np.ndarray:
+# closing sieve, minima extrema processing
+@jit(nopython=True, parallel=True)
+def o_sieve(data: np.ndarray, r: int, x: int) -> float:
     # start bound is starting point of first interval
     start_bound = 0 if x - r < -1 else x - r + 1
     # end bound is *one after* starting point of last interval
     end_bound = len(data) - r + 1 if x + r > len(data) else x + 1
 
-    # set up loop
-    # start_bounds = np.arange(start_bound, end_bound)
-    # end_bounds = np.arange(start_bound + r, end_bound + r)
-    subsets = np.empty((end_bound - start_bound, r))
+    subset_minima = np.empty((end_bound - start_bound))
     for i in prange(end_bound - start_bound):
         start = start_bound + i
-        subsets[i] = data[start:start+r]
-    return subsets
+        subset_minima[i] = np.min(data[start:start + r])
 
-# closing sieve, minima extrema processing
-@jit(nopython=True)
-def o_sieve(data: np.ndarray, r: int, x: int) -> float:
-    # Array stores min of starting point and next r values
-    subsets = connected_subsets(data, r, x)
-    subset_minima = np.empty(subsets.shape[0])
-    for i in prange(subsets.shape[0]):
-        subset_minima[i] = np.min(subsets[i])
-    # subset_minima = np.min(subsets, 1)
     return np.max(subset_minima)
 
 # one iteration of the multiscale analysis
 @jit(nopython=True, parallel=True)
 def multiscale_step(r: int, previous: np.ndarray) -> np.ndarray:
-    post = np.empty_like(previous)
-    for i in prange(len(previous)):
+    post = np.empty(4800)
+    for i in prange(4800):
         post[i] = o_sieve(previous, r, i)
     return post
 
