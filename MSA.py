@@ -3,7 +3,7 @@ import numpy as np
 
 
 # returns the set of connected subsets containing r elements, containing x
-@jit(nopython=True, parallel=True)
+@jit(nopython=True)
 def connected_subsets(data: np.ndarray, r: int, x: int) -> np.ndarray:
     # start bound is starting point of first interval
     start_bound = 0 if x - r < -1 else x - r + 1
@@ -20,7 +20,7 @@ def connected_subsets(data: np.ndarray, r: int, x: int) -> np.ndarray:
     return subsets
 
 # closing sieve, minima extrema processing
-@jit(nopython=True, parallel=True)
+@jit(nopython=True)
 def o_sieve(data: np.ndarray, r: int, x: int) -> float:
     # Array stores min of starting point and next r values
     subsets = connected_subsets(data, r, x)
@@ -39,11 +39,11 @@ def multiscale_step(r: int, previous: np.ndarray) -> np.ndarray:
     return post
 
 # full multiscale analysis
-@jit(nopython=True, parallel=True)
+@jit(nopython=True)
 def multiscale_full(initial: np.ndarray) -> np.ndarray:
     filters = np.empty((61, 4800))
     filters[0] = initial
-    for i in prange(1, 61):
+    for i in range(1, 61):
         filters[i] = multiscale_step(i+1, initial)
     return filters
 
