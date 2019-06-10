@@ -9,8 +9,8 @@ from sklearn.preprocessing import StandardScaler
 
 # DIRECTORY OF TRAINING DATA
 files = os.listdir('training_dump')
-data = np.empty((10, 60))
-for i, file in enumerate(files[:10]):
+data = np.empty((len(files), 60))
+for i, file in enumerate(files):
     # Extract lip as 60x80 image
     file = os.path.join('training_dump', file)
     fe = FeatureExtractor.from_image(file)
