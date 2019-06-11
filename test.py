@@ -12,10 +12,18 @@ import time
 
 start_time = time.time()
 
+# READ FILE HERE
+label_dict = {}
+
 # DIRECTORY OF TRAINING DATA
 files = os.listdir('training_dump')
+# files = files[:1000]
+labels = []
 data = np.empty((len(files), 60))
 for i, file in enumerate(files):
+    # Get label for file
+    # labels.append(label_dict[file])
+
     # Extract lip as 60x80 image
     file = os.path.join('training_dump', file)
     fe = FeatureExtractor.from_image(file)
@@ -32,8 +40,8 @@ for i, file in enumerate(files):
     differences = filters[1:] - filters[:-1]
     data[i] = np.sum(differences, 1)
     # print("File {} complete.".format(i))
-
 pickle.dump(data, open('data.pk', 'wb'))
+
 # Perform PCA on (normalized) training data
 scaler = StandardScaler()
 scaler.fit(data)
@@ -46,7 +54,11 @@ training = pca.transform(normalized)
 
 print("------{} seconds elapsed".format(time.time()-start_time))
 
-# Train/test logistic regression, need to get labels in some way; not finished
-# logistic_regression = LogisticRegression(solver='lbfgs')
-# logistic_regression.fit(training, LABELS)
+# Train logistic regression, need to get labels in some way; not finished
+logistic_regression = LogisticRegression(solver='lbfgs')
+logistic_regression.fit(training, labels)
+logistic_regression.predict(training)
+
+
+# TESTING
 # logistic_regression.predict(testing)
