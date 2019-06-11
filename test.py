@@ -56,7 +56,7 @@ training_features = training_features[:len(training_labels), ]
 print("------{} seconds elapsed".format(time.time()-start_time))
 
 # Dump features from training data
-pickle.dump(training_features, open('data.pk', 'wb'))
+pickle.dump(training_features, open('training_features.pk', 'wb'))
 
 # Perform PCA on (normalized) training data
 scaler = StandardScaler()
@@ -68,6 +68,7 @@ pca.fit(training_normalized)
 # Now can apply PCA mapping like so:
 training_transformed = pca.transform(training_normalized)
 
+pickle.dump(training_features, open('training_transformed_after_PCA.pk', 'wb'))
 # Train logistic regression
 logistic_regression = LogisticRegression(solver='lbfgs')
 logistic_regression.fit(training_transformed, training_labels)
