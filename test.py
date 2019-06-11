@@ -128,7 +128,7 @@ test_transformed = pca.transform(test_normalized)
 testing_predictions = logistic_regression.predict(test_transformed)
 total = 0
 correct = 0
-for i in range(testing_predictions):
+for i in range(len(testing_predictions)):
     if (testing_predictions[i] == test_labels[i]):
         correct = correct + 1
     total = total + 1
