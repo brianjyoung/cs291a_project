@@ -13,19 +13,30 @@ import time
 start_time = time.time()
 
 # READ FILE HERE
-label_dict = {}
+label_dict_train = {}
+label_dict_test  =  {}
+
+train_label_file = open('train_complete_file.txt','r')
+for line in train_label_file.readlines():
+    line_input = line.split(" ")
+    label_dict_train[line_input[0]] = line_input[2].rstrip()
+train_label_file.close()
+
+test_label_file = open('test_complete_file.txt','r')
+for line in test_label_file.readlines():
+    line_input = line.split(" ")
+    label_dict_test[line_input[0]] = line_input[2].rstrip()
+test_label_file.close()
 
 # DIRECTORY OF TRAINING DATA
-files = os.listdir('training_dump')
-# files = files[:1000]
+files = os.listdir('train_data')
+files = files[:10]
 labels = []
 data = np.empty((len(files), 60))
 for i, file in enumerate(files):
     # Get label for file
-    # labels.append(label_dict[file])
-
     # Extract lip as 60x80 image
-    file = os.path.join('training_dump', file)
+    file = os.path.join('train_data', file)
     fe = FeatureExtractor.from_image(file)
     fe.face_detect()
     fe.landmark_detect()
@@ -39,6 +50,7 @@ for i, file in enumerate(files):
     filters = MSA.multiscale_full(fe.lips[0].flatten('F'))
     differences = filters[1:] - filters[:-1]
     data[i] = np.sum(differences, 1)
+    labels.append(label_dict_train[file])
     # print("File {} complete.".format(i))
 pickle.dump(data, open('data.pk', 'wb'))
 
@@ -62,3 +74,4 @@ logistic_regression.predict(training)
 
 # TESTING
 # logistic_regression.predict(testing)
+
