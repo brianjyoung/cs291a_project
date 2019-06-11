@@ -90,13 +90,13 @@ class FeatureExtractor(object):
                 self.features[i] = 0
 
     def crop_lips(self):
-        self.lips = np.empty((self.length, 60, 80))
+        self.lips = np.empty((self.length, 60, 80), dtype=np.uint8)
         center_x = 100
         center_y = 100
         for i in range(len(self.frames)):
             if not (self.features[i] == 0).all():
-                center_y = int((self.features[i][0][0] + self.features[i][1][0]) / 2)
-                center_x = int((self.features[i][2][1] + self.features[i][3][1]) / 2)
+                center_x = int((self.features[i][2][0] + self.features[i][3][0]) / 2)
+                center_y = int((self.features[i][0][1] + self.features[i][1][1]) / 2)
             else:
                 self.lips = None
                 return
