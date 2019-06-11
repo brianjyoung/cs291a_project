@@ -46,8 +46,6 @@ training = pca.transform(normalized)
 
 print("------{} seconds elapsed".format(time.time()-start_time))
 
-MSA.o_sieve.parallel_diagnostics(level=4)
-
 # Train/test logistic regression, need to get labels in some way; not finished
 # logistic_regression = LogisticRegression(solver='lbfgs')
 # logistic_regression.fit(training, LABELS)
