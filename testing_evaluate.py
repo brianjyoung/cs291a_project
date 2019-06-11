@@ -17,6 +17,12 @@ logistic_regression = pickle.load( open( "logistic_regression.pk", "rb" ) )
 label_dict_test = {}
 files = os.listdir('test_data')
 
+test_label_file = open(os.path.join('label_data', 'test_complete_file.txt'), 'r')
+for line in test_label_file.readlines():
+    line_input = line.split(" ")
+    label_dict_test[line_input[0]] = line_input[2].rstrip()
+test_label_file.close()
+
 test_labels = []
 test_features = np.empty((len(files), 60))
 for i, file in enumerate(files):
