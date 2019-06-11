@@ -27,7 +27,6 @@ test_labels = []
 test_features = np.empty((len(files), 60))
 for i, file in enumerate(files):
     # Get label for file
-    try:
         file_name = file
     # Extract lip as 60x80 image
         file = os.path.join('test_data', file)
@@ -45,8 +44,7 @@ for i, file in enumerate(files):
         differences = filters[1:] - filters[:-1]
         test_features[i] = np.sum(differences, 1)
         test_labels.append(label_dict_test[file_name])
-    except:
-        continue
+
         # print("File {} complete.".format(i))
 
 # Crop training features, in case any faces could not be detected
