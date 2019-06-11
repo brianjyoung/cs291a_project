@@ -14,7 +14,6 @@ start_time = time.time()
 
 # DIRECTORY OF TRAINING DATA
 files = os.listdir('training_dump')
-files = files
 data = np.empty((len(files), 60))
 for i, file in enumerate(files):
     # Extract lip as 60x80 image
