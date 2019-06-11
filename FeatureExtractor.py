@@ -98,7 +98,6 @@ class FeatureExtractor(object):
                 center_y = int((self.features[i][0][0] + self.features[i][1][0]) / 2)
                 center_x = int((self.features[i][2][1] + self.features[i][3][1]) / 2)
             else:
-                print("Lips not found; skipping image")
                 self.lips = None
                 return
             lip = self.frames_gray[i][center_y - 90: center_y + 90, center_x - 120: center_x + 120]
