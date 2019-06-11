@@ -13,8 +13,8 @@ def largest_box(arr: np.ndarray) -> np.ndarray:
 class FeatureExtractor(object):
     face_cascade = cv2.CascadeClassifier(join('extraction_models', 'haarcascade_frontalface_default.xml'))
     face_detector = dlib.get_frontal_face_detector()
-    face_network = cv2.dnn.readNetFromCaffe(join('extraction_models', 'deploy.prototxt'),
-                                            join('extraction_models', 'res10_300x300_ssd_iter_140000.caffemodel'))
+    # face_network = cv2.dnn.readNetFromCaffe(join('extraction_models', 'deploy.prototxt'),
+    #                                         join('extraction_models', 'res10_300x300_ssd_iter_140000.caffemodel'))
     landmark_predictor = dlib.shape_predictor(join('extraction_models', 'shape_predictor_68_face_landmarks.dat'))
 
     def __init__(self, video_file: str):
@@ -112,8 +112,7 @@ class FeatureExtractor(object):
             else:
                 self.lips = None
                 return
-            lip = self.frames_gray[i][center_y - 30: center_y + 30, center_x - 40: center_x + 40]
-            self.lips[i] = (cv2.resize(lip, (80, 60)))
+            self.lips[i] = self.frames_gray[i][center_y - 30: center_y + 30, center_x - 40: center_x + 40]
 
     def show_video(self):
         for frame in self.frames_gray:
