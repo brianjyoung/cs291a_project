@@ -13,6 +13,8 @@ def largest_box(arr: np.ndarray) -> np.ndarray:
 class FeatureExtractor(object):
     face_cascade = cv2.CascadeClassifier(join('extraction_models', 'haarcascade_frontalface_default.xml'))
     face_detector = dlib.get_frontal_face_detector()
+    face_network = cv2.dnn.readNetFromCaffe(join('extraction_models', 'deploy.prototxt'),
+                                            join('extraction_models', 'res10_300x300_ssd_iter_140000.caffemodel'))
     landmark_predictor = dlib.shape_predictor(join('extraction_models', 'shape_predictor_68_face_landmarks.dat'))
 
     def __init__(self, video_file: str):
@@ -34,7 +36,7 @@ class FeatureExtractor(object):
     def from_image(cls, image_file: str):
         fe = cls('')
         fe.video = None
-        fe.frames = [cv2.imread(image_file)]
+        fe.frames = [cv2.resize(cv2.imread(image_file), None, fx=0.33, fy=0.33)]
         fe.frames_gray = [cv2.cvtColor(fe.frames[0], cv2.COLOR_BGR2GRAY)]
         fe.length = 1
         (fe.height, fe.width, _) = fe.frames[0].shape
@@ -61,16 +63,28 @@ class FeatureExtractor(object):
         self.faces = np.empty((self.length, 4), dtype=int)
         for i in range(len(self.frames)):
             frame_gray = self.frames_gray[i]
-            faces = FeatureExtractor.face_cascade.detectMultiScale(frame_gray, 1.3, 5)
-            # face_rects = FeatureExtractor.face_detector(frame_gray, 0)
-            # faces = np.array([face_utils.rect_to_bb(face_rect) for face_rect in face_rects])
-            if len(faces) > 0:
-                self.faces[i] = largest_box(faces)
+            # faces = FeatureExtractor.face_cascade.detectMultiScale(frame_gray)
+            # if len(faces) > 0:
+            #     self.faces[i] = largest_box(faces)
+            #     if draw:
+            #         (x, y, w, h) = largest_box(faces)
+            #         cv2.rectangle(frame_gray, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            # else:  # face not found, error in detection, ignore frame
+            #     self.faces[i] = 0
+            face_rects = FeatureExtractor.face_detector(frame_gray, 0)
+            if len(face_rects) > 0:
+                self.faces[i] = face_utils.rect_to_bb(face_rects[0])
                 if draw:
-                    (x, y, w, h) = largest_box(faces)
+                    (x, y, w, h) = face_utils.rect_to_bb(face_rects[0])
                     cv2.rectangle(frame_gray, (x, y), (x + w, y + h), (0, 255, 0), 2)
-            else:  # face not found, error in detection, ignore frame
-                self.faces[i] = 0
+            # frame = self.frames[i]
+            # blob = cv2.dnn.blobFromImage(cv2.resize(frame, (300, 300)), 1.0, (300, 300), (104.0, 177.0, 123.0))
+            # FeatureExtractor.face_network.setInput(blob)
+            # box = (FeatureExtractor.face_network.forward()[0, 0, 0, 3:7]
+            #        * np.array([self.width, self.height, self.width, self.height])).astype(int)
+            # self.faces[i] = box[0], box[1], box[2] - box[0], box[3] - box[1]
+            # if draw:
+            #     cv2.rectangle(frame_gray, (box[0], box[1]), (box[2], box[3]), (0, 255, 0), 2)
 
     def landmark_detect(self, draw: bool = False):
         self.features = np.empty((self.length, 4, 2), dtype=int)
@@ -98,7 +112,7 @@ class FeatureExtractor(object):
             else:
                 self.lips = None
                 return
-            lip = self.frames_gray[i][center_y - 90: center_y + 90, center_x - 120: center_x + 120]
+            lip = self.frames_gray[i][center_y - 30: center_y + 30, center_x - 40: center_x + 40]
             self.lips[i] = (cv2.resize(lip, (80, 60)))
 
     def show_video(self):

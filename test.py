@@ -31,14 +31,14 @@ test_label_file.close()
 
 # Read training files
 files = os.listdir('train_data')
-files = files[:20]
+files = files
 training_labels = []
 training_features = np.empty((len(files), 60))
 for i, file_name in enumerate(files):
     # Extract lip as 60x80 image
     file = os.path.join('train_data', file_name)
     fe = FeatureExtractor.from_image(file)
-    fe.face_detect()
+    fe.face_detect(draw=True)
     fe.landmark_detect()
     fe.crop_lips()
     # print("File {} lips extracted.".format(i))
