@@ -36,23 +36,26 @@ training_labels = []
 training_features = np.empty((len(files), 60))
 for i, file_name in enumerate(files):
     # Extract lip as 60x80 image
-    file = os.path.join('train_data', file_name)
-    fe = FeatureExtractor.from_image(file)
-    fe.face_detect(draw=True)
-    fe.landmark_detect()
-    fe.crop_lips()
+    try:
+        file = os.path.join('train_data', file_name)
+        fe = FeatureExtractor.from_image(file)
+        fe.face_detect(draw=True)
+        fe.landmark_detect()
+        fe.crop_lips()
     # print("File {} lips extracted.".format(i))
 
     # Convert lip image to 60-dimensional feature vector
-    if fe.lips is None:
-        print("File {} skipped, lips could not be found.".format(i))
-        continue
-    filters = MSA.multiscale_full(fe.lips[0].flatten('F'))
-    differences = filters[1:] - filters[:-1]
-    training_features[i] = np.sum(differences, 1)
+        if fe.lips is None:
+            print("File {} skipped, lips could not be found.".format(i))
+            continue
+        filters = MSA.multiscale_full(fe.lips[0].flatten('F'))
+        differences = filters[1:] - filters[:-1]
+        training_features[i] = np.sum(differences, 1)
 
-    training_labels.append(label_dict_train[file_name])
+        training_labels.append(label_dict_train[file_name])
     # print("File {} complete.".format(i))
+    except:
+        continue
 
 # Crop training features, in case any faces could not be detected
 training_features = training_features[:len(training_labels), ]
@@ -102,7 +105,6 @@ for i, file in enumerate(files):
     filters = MSA.multiscale_full(fe.lips[0].flatten('F'))
     differences = filters[1:] - filters[:-1]
     test_features[i] = np.sum(differences, 1)
-
     test_labels.append(label_dict_test[file_name])
     # print("File {} complete.".format(i))
 
@@ -116,3 +118,11 @@ test_transformed = pca.transform(training_normalized)
 
 # Test logistic regression
 testing_predictions = logistic_regression.predict(test_transformed)
+total = 0
+correct = 0
+for i in range(testing_predictions):
+    if (testing_predictions[i] == test_labels[i]):
+        correct = correct + 1
+    total = total + 1
+print(total)
+print(correct)
