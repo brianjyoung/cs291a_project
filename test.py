@@ -15,7 +15,7 @@ start_time = time.time()
 # DIRECTORY OF TRAINING DATA
 files = os.listdir('training_dump')
 data = np.empty((len(files), 60))
-for i, file in enumerate(files[:80]):
+for i, file in enumerate(files):
     # Extract lip as 60x80 image
     file = os.path.join('training_dump', file)
     fe = FeatureExtractor.from_image(file)
@@ -45,6 +45,8 @@ pca.fit(normalized)
 training = pca.transform(normalized)
 
 print("------{} seconds elapsed".format(time.time()-start_time))
+
+MSA.o_sieve.parallel_diagnostics(level=4)
 
 # Train/test logistic regression, need to get labels in some way; not finished
 # logistic_regression = LogisticRegression(solver='lbfgs')

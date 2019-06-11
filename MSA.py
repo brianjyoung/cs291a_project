@@ -2,7 +2,7 @@ from numba import jit, prange
 import numpy as np
 
 # closing sieve, minima extrema processing
-@jit(nopython=True, parallel=True)
+@jit(nopython=True)
 def o_sieve(subset_minima: np.ndarray, r: int, x: int) -> float:
     # start bound is starting point of first interval
     start_bound = 0 if x - r < -1 else x - r + 1
@@ -10,7 +10,7 @@ def o_sieve(subset_minima: np.ndarray, r: int, x: int) -> float:
     end_bound = 4800 - r + 1 if x + r > 4800 else x + 1
 
     x_minimum = subset_minima[start_bound]
-    for i in prange(1, end_bound - start_bound):
+    for i in range(1, end_bound - start_bound):
         x_minimum = min(x_minimum, subset_minima[start_bound + i])
     return x_minimum
 
