@@ -14,10 +14,12 @@ def largest_box(arr: np.ndarray) -> np.ndarray:
 
 class FeatureExtractor(object):
     face_cascade = cv2.CascadeClassifier(FACE_CASCADE_FILE)
-    mouth_cascade = cv2.CascadeClassifier(MOUTH_CASCADE_FILE)
+    face_detector = dlib.get_frontal_face_detector()
     landmark_predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat')
 
     def __init__(self, video_file: str):
+        if video_file is '':
+            return
         self.video = cv2.VideoCapture(video_file)
         self.length = int(self.video.get(cv2.CAP_PROP_FRAME_COUNT))
         self.height = int(self.video.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -62,6 +64,8 @@ class FeatureExtractor(object):
         for i in range(len(self.frames)):
             frame_gray = self.frames_gray[i]
             faces = FeatureExtractor.face_cascade.detectMultiScale(frame_gray, 1.3, 5)
+            # face_rects = FeatureExtractor.face_detector(frame_gray, 0)
+            # faces = np.array([face_utils.rect_to_bb(face_rect) for face_rect in face_rects])
             if len(faces) > 0:
                 self.faces[i] = largest_box(faces)
                 if draw:
@@ -69,23 +73,6 @@ class FeatureExtractor(object):
                     cv2.rectangle(frame_gray, (x, y), (x + w, y + h), (0, 255, 0), 2)
             else:  # face not found, error in detection, ignore frame
                 self.faces[i] = 0
-
-    def mouth_detect(self, draw: bool = False):
-        self.mouths = []
-        for i in range(len(self.frames)):
-            if not np.isnan(self.faces[i]):
-                (x, y, w, h) = self.faces[i]
-                roi = self.frames_gray[i][y:y + h, x:x + w]
-                mouths = FeatureExtractor.mouth_cascade.detectMultiScale(roi, 1.3, 5)
-                if len(mouths) > 0:
-                    self.mouths.append(largest_box(mouths))
-                    if draw:
-                        (x, y, w, h) = largest_box(mouths)
-                        cv2.rectangle(roi, (x, y), (x + w, y + h), (0, 255, 0), 2)
-                else:
-                    self.mouths.append(None)
-            else:
-                self.mouths.append(None)
 
     def landmark_detect(self, draw: bool = False):
         self.features = np.empty((self.length, 4, 2), dtype=int)

@@ -9,10 +9,10 @@ def o_sieve(subset_minima: np.ndarray, r: int, x: int) -> float:
     # end bound is *one after* starting point of last interval
     end_bound = 4800 - r + 1 if x + r > 4800 else x + 1
 
-    x_minima = np.empty((end_bound - start_bound))
-    for i in prange(end_bound - start_bound):
-        x_minima[i] = subset_minima[start_bound + i]
-    return np.max(x_minima)
+    x_minimum = subset_minima[start_bound]
+    for i in prange(1, end_bound - start_bound):
+        x_minimum = min(x_minimum, subset_minima[start_bound + i])
+    return x_minimum
 
 # one iteration of the multiscale analysis
 @jit(nopython=True, parallel=True)
@@ -30,11 +30,11 @@ def multiscale_step(r: int, initial: np.ndarray) -> np.ndarray:
     return post
 
 # full multiscale analysis
-@jit(nopython=True)
+@jit(nopython=True, parallel=True)
 def multiscale_full(initial: np.ndarray) -> np.ndarray:
     filters = np.empty((61, 4800))
     filters[0] = initial
-    for i in range(1, 61):
+    for i in prange(1, 61):
         filters[i] = multiscale_step(i+1, initial)
     return filters
 
