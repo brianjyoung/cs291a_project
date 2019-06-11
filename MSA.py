@@ -30,11 +30,11 @@ def multiscale_step(r: int, initial: np.ndarray) -> np.ndarray:
     return post
 
 # full multiscale analysis
-@jit(nopython=True, parallel=True)
+@jit(nopython=True)
 def multiscale_full(initial: np.ndarray) -> np.ndarray:
     filters = np.empty((61, 4800))
     filters[0] = initial
-    for i in prange(1, 61):
+    for i in range(1, 61):
         filters[i] = multiscale_step(i+1, initial)
     return filters
 
